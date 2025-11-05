@@ -1,0 +1,16 @@
+classdef cwtObj
+    properties
+    frequencyArray {double} = [];
+    timeArray {double} = [];
+    complex_cwt 
+    end
+
+    methods
+
+        function obj = cwtObj(f, t, cfs)
+
+        end
+
+    end
+
+end
