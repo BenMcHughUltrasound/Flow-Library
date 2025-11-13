@@ -1,0 +1,56 @@
+clear
+close all
+clc
+
+scope = Wave_Lib();
+
+TransmitTR10Raw = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0000.CSV");
+TransmitTR4Raw = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0001.CSV");
+
+Transmit10Recieve4Raw = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0003.CSV");
+Transmit4Recieve10Raw = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0004.CSV");
+
+RecieveTR10 = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0005.CSV");
+RecieveTR4 = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0006.CSV");
+
+drivePulseRaw = scope.LoadWaveforms("C:\Users\benmc\OneDrive - University of Warwick\Desktop\PhD\Flow Rig Analysis\FlowLibrary\NEW_FOL\TEK0007.CSV");
+
+%%
+TransmitTR10Cut = scope.cutWaveObj(TransmitTR10Raw, 47e-6, 1);
+TransmitTR4Cut = scope.cutWaveObj(TransmitTR4Raw, 47e-6, 1);
+
+RecieveTR4Cut = scope.cutWaveObj(RecieveTR4, 83.4e-6,1);
+RecieveTR10Cut = scope.cutWaveObj(RecieveTR10, 83.4e-6,1);
+
+%%
+
+fftDrive = scope.fftObj(drivePulseRaw,1,1,1e5);
+
+fftTransmitTR10 = scope.fftObj(TransmitTR10Cut,1,1,1e5);
+fftTransmitTR4 = scope.fftObj(TransmitTR4Cut, 1,1, 1e5);
+
+fftRecieveTR4 = scope.fftObj(RecieveTR4Cut,1,1,1e5);
+fftRecieveTR10 = scope.fftObj(RecieveTR10Cut,1,1,1e5);
+
+tento4Transferdata = fftTransmitTR10.c.*fftRecieveTR4.c.*fftDrive.c;
+fourto10Transferdata = fftTransmitTR4.c.*fftRecieveTR10.c.*fftDrive.c;
+
+
+Trans10to4 = fftObj(1,1,fftDrive.f, tento4Transferdata);
+Trans10to4win = scope.windowfftObj(Trans10to4, 0e6, 10e6, 0);
+Trans4to10 = fftObj(1,1,fftDrive.f, fourto10Transferdata);
+Trans4to10win = scope.windowfftObj(Trans4to10, 0e6, 10e6, 0)
+
+reprod1 = scope.IFFTObj(Trans10to4);
+reprod1 = scope.normWaveObj(reprod);
+reprod2 = scope.IFFTObj(Trans4to10win)
+
+scope.plt(reprod,1)
+scope.plt(scope.normWaveObj(Transmit10Recieve4Raw), 1)
+
+
+
+
+
+
+
